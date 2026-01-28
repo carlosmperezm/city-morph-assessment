@@ -1,6 +1,6 @@
 import { useEffect, useState, type JSX } from "react";
 import { getDashboardData, getSignedImageUrls } from "../services/apiService";
-import type { DashboardData, ImagesResponse } from "../types";
+import type { DashboardData, ImagesResponse, SignedImage } from "../types";
 import { signOut } from "aws-amplify/auth";
 
 export default function DashboardPage(): JSX.Element {
@@ -52,9 +52,39 @@ export default function DashboardPage(): JSX.Element {
     return <h1>No data available</h1>;
   }
   return (
-    <>
-      <h1>Hello {dashboardData.user.name}</h1>
-      <button onClick={handleSignout}>Sign Out</button>
-    </>
+    <div className="dashboard">
+      <header>
+        <h1>City Morph Studio</h1>
+        <button onClick={handleSignout}>Sign Out</button>
+      </header>
+      <section className="user-section">
+        <h2>Hello {dashboardData.user.name}</h2>
+      </section>
+      <section className="product-section">
+        <ul>
+          {dashboardData.products.map((product) => {
+            const imageData: SignedImage | undefined =
+              productImages.images.find(
+                (image) => image.key === product.image_key,
+              );
+            if (
+              !imageData ||
+              (dashboardData.user.role === "standard" &&
+                product.visible_to_role !== "standard")
+            ) {
+              return null;
+            }
+            return (
+              <li key={product.id} className="product">
+                <img src={imageData.signedUrl} alt={product.name} />
+                <p className="product-name">{product.name}</p>
+                <p className="product-description">{product.description}</p>
+                <p className="product-price">{product.price}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    </div>
   );
 }
