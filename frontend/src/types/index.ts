@@ -12,3 +12,14 @@ export interface Product {
   price: number;
   visible_to_role: "standard" | "admin";
 }
+export interface DashboardData {
+  user: User;
+  products: Product[];
+}
+export interface SignedImage {
+  key: string;
+  signedUrl: string;
+}
+export interface ImagesResponse {
+  images: SignedImage[];
+}
