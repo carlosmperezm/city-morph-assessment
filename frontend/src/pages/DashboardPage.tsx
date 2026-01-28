@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type JSX } from "react";
 import { getDashboardData, getSignedImageUrls } from "../services/apiService";
 import type { DashboardData, ImagesResponse } from "../types";
+import { signOut } from "aws-amplify/auth";
 
-export default function DashboardPage() {
+export default function DashboardPage(): JSX.Element {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null,
   );
@@ -11,6 +12,10 @@ export default function DashboardPage() {
   );
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleSignout(): Promise<void> {
+    return await signOut();
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -49,6 +54,7 @@ export default function DashboardPage() {
   return (
     <>
       <h1>Hello {dashboardData.user.name}</h1>
+      <button onClick={handleSignout}>Sign Out</button>
     </>
   );
 }
