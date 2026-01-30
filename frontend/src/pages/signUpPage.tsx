@@ -17,15 +17,13 @@ export default function SignUpPage(): JSX.Element {
     event.preventDefault();
     setIsLoading(true);
     try {
-      const { isSignUpComplete } = await signUp({
+      await signUp({
         username: email,
         password,
       });
 
-      if (isSignUpComplete) {
-        await signIn({ username: email, password });
-        navigate("/dashboard");
-      }
+      await signIn({ username: email, password });
+      navigate("/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error signing up");
     } finally {

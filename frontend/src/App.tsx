@@ -38,11 +38,18 @@ function App() {
     <BrowserRouter>
       <Routes>
         {isAuthenticated ? (
-          <Route
-            path="/"
-            element={<DashboardPage />}
-            errorElement={<ErrorPage />}
-          />
+          <>
+            <Route
+              path="/"
+              element={<DashboardPage />}
+              errorElement={<ErrorPage />}
+            />
+            <Route
+              path="/dashboard"
+              element={<DashboardPage />}
+              errorElement={<ErrorPage />}
+            />
+          </>
         ) : (
           <>
             <Route
