@@ -18,6 +18,4 @@ const amplifyConfig = {
   },
 };
 
-export function setUpAmplify() {
-  return Amplify.configure(amplifyConfig);
-}
+Amplify.configure(amplifyConfig);
