@@ -3,6 +3,7 @@ import * as cdk from "aws-cdk-lib/core";
 import { BackendStack } from "../lib/backend-stack";
 import { CognitoStack } from "../lib/cognito-stack";
 import { ApiStack } from "../lib/api-stack";
+import { RdsStack } from "../lib/rds-stack";
 
 const app = new cdk.App();
 
@@ -19,6 +20,12 @@ new CognitoStack(app, "CognitoStack", {
   },
 });
 new ApiStack(app, "ApiStack", {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+});
+new RdsStack(app, "RdsStack", {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
