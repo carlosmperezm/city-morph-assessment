@@ -19,15 +19,18 @@ new CognitoStack(app, "CognitoStack", {
     region: process.env.CDK_DEFAULT_REGION,
   },
 });
-new ApiStack(app, "ApiStack", {
+const rdsStack = new RdsStack(app, "RdsStack", {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
   },
 });
-new RdsStack(app, "RdsStack", {
+const apiStack = new ApiStack(app, "ApiStack", {
+  rdsStack,
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
   },
 });
+
+apiStack.addDependency(rdsStack);

@@ -1,29 +1,84 @@
-import { APIGatewayProxyResult } from "aws-lambda";
+import { APIGatewayProxyResult, APIGatewayProxyEvent } from "aws-lambda";
+import {
+  SecretsManagerClient,
+  GetSecretValueCommand,
+} from "@aws-sdk/client-secrets-manager";
+import { Pool } from "pg";
 
-export async function handler(): Promise<APIGatewayProxyResult> {
-  return {
-    statusCode: 200,
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      user: {
-        name: "Demo User",
-        email: "demo@example.com",
-        role: "standard",
+const secretsClient = new SecretsManagerClient();
+let dbPool: Pool | null = null;
+
+interface DbSecret {
+  username: string;
+  password: string;
+  host: string;
+  port: number;
+  dbname: string;
+}
+
+async function getDbPool(): Promise<Pool> {
+  if (dbPool) return dbPool;
+
+  const secretArn = process.env.DB_SECRET_ARN;
+  if (!secretArn) throw new Error("DB_SECRET_ARN not set");
+
+  const response = await secretsClient.send(
+    new GetSecretValueCommand({ SecretId: secretArn }),
+  );
+
+  if (!response.SecretString) throw new Error("Secret not found");
+
+  const secret: DbSecret = JSON.parse(response.SecretString);
+
+  dbPool = new Pool({
+    host: secret.host,
+    port: secret.port,
+    database: secret.dbname,
+    user: secret.username,
+    password: secret.password,
+    max: 2,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  });
+
+  return dbPool;
+}
+
+export async function handler(
+  event: APIGatewayProxyEvent,
+): Promise<APIGatewayProxyResult> {
+  try {
+    const pool = await getDbPool();
+
+    // Query products from DB
+    const result = await pool.query(
+      "SELECT id, name, image_key FROM products LIMIT 10",
+    );
+
+    return {
+      statusCode: 200,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
       },
-      products: [
-        {
-          id: "1",
-          name: "Product 1",
-          image_key: "product1.jpg",
+      body: JSON.stringify({
+        user: {
+          name: "Demo User",
+          email: "demo@example.com",
+          role: "standard",
         },
-        {
-          id: "2",
-          name: "Product 2",
-          image_key: "product2.jpg",
-        },
-      ],
-    }),
-  };
+        products: result.rows,
+      }),
+    };
+  } catch (error) {
+    console.error("Error:", error);
+    return {
+      statusCode: 500,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        error: "Internal server error",
+        message: error instanceof Error ? error.message : "Unknown error",
+      }),
+    };
+  }
 }
