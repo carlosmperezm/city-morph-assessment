@@ -2,6 +2,8 @@ import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as rds from "aws-cdk-lib/aws-rds";
+import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
+import * as lambda from "aws-cdk-lib/aws-lambda";
 
 export class RdsStack extends cdk.Stack {
   public readonly vpc: ec2.Vpc;
@@ -43,14 +45,28 @@ export class RdsStack extends cdk.Stack {
       vpc: this.vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       securityGroups: [this.dbSecurityGroup],
-      credentials: rds.Credentials.fromGeneratedSecret("db-admin"),
-      databaseName: "city-morph",
+      credentials: rds.Credentials.fromGeneratedSecret("dbadmin"),
+      databaseName: "citymorph",
       publiclyAccessible: false,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       deleteAutomatedBackups: true,
     });
 
+    const seedDbFn = new lambdaNodejs.NodejsFunction(this, "seedDbFunction", {
+      entry: "lambda/init-db/seed.ts",
+      handler: "seedDb",
+      runtime: lambda.Runtime.NODEJS_24_X,
+      vpc: this.vpc,
+      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      securityGroups: [this.lambdaSecurityGroup],
+      environment: {
+        DB_SECRET_ARN: this.dbInstance.secret?.secretArn ?? "",
+      },
+    });
+
     this.dbInstance.connections.allowDefaultPortFrom(this.lambdaSecurityGroup);
+    this.dbInstance.secret?.grantRead(seedDbFn);
+    seedDbFn.node.addDependency(this.dbInstance);
 
     new cdk.CfnOutput(this, "DbEndpoint", {
       value: this.dbInstance.dbInstanceEndpointAddress,

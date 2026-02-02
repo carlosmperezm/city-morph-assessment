@@ -1,4 +1,4 @@
-import { APIGatewayProxyResult, APIGatewayProxyEvent } from "aws-lambda";
+import * as lambda from "aws-lambda";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
@@ -36,6 +36,9 @@ async function getDbPool(): Promise<Pool> {
     database: secret.dbname,
     user: secret.username,
     password: secret.password,
+    ssl: {
+      rejectUnauthorized: false,
+    },
     max: 2,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 2000,
@@ -44,16 +47,13 @@ async function getDbPool(): Promise<Pool> {
   return dbPool;
 }
 
-export async function handler(
-  event: APIGatewayProxyEvent,
-): Promise<APIGatewayProxyResult> {
+export async function getData(
+  event: lambda.APIGatewayProxyEvent,
+): Promise<lambda.APIGatewayProxyResult> {
   try {
     const pool = await getDbPool();
 
-    // Query products from DB
-    const result = await pool.query(
-      "SELECT id, name, image_key FROM products LIMIT 10",
-    );
+    const result = await pool.query("SELECT * FROM products ");
 
     return {
       statusCode: 200,
@@ -73,7 +73,7 @@ export async function handler(
   } catch (error) {
     console.error("Error:", error);
     return {
-      statusCode: 500,
+      statusCode: 400,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         error: "Internal server error",

@@ -3,7 +3,6 @@ import { Construct } from "constructs";
 import * as apigateway from "aws-cdk-lib/aws-apigateway";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
-import * as path from "path";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { RdsStack } from "./rds-stack";
 
@@ -21,16 +20,16 @@ export class ApiStack extends cdk.Stack {
       this,
       "DashboardFunction",
       {
-        entry: path.join(__dirname, "../lambda/dashboard/handler.ts"),
-        handler: "handler",
-        runtime: lambda.Runtime.NODEJS_20_X,
+        entry: "lambda/dashboard/get-data.ts",
+        handler: "getData",
+        runtime: lambda.Runtime.NODEJS_24_X,
         vpc: rdsStack.vpc,
         vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
         securityGroups: [rdsStack.lambdaSecurityGroup],
         environment: {
           DB_ENDPOINT: rdsStack.dbInstance.dbInstanceEndpointAddress,
           DB_SECRET_ARN: rdsStack.dbInstance.secret?.secretArn ?? "",
-          DB_NAME: "city-morph",
+          DB_NAME: "citymorph",
         },
       },
     );
