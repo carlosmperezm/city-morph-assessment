@@ -30,7 +30,7 @@ export class ApiStack extends cdk.Stack {
         environment: {
           DB_ENDPOINT: rdsStack.dbInstance.dbInstanceEndpointAddress,
           DB_SECRET_ARN: rdsStack.dbInstance.secret?.secretArn ?? "",
-          DB_NAME: "citymorph",
+          DB_NAME: "city-morph",
         },
       },
     );

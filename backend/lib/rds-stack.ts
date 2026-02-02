@@ -20,7 +20,7 @@ export class RdsStack extends cdk.Stack {
     this.dbSecurityGroup = new ec2.SecurityGroup(this, "DbSecurityGroup", {
       vpc: this.vpc,
       description: "Allow DB access from Lambda SG",
-      allowAllOutbound: true,
+      allowAllOutbound: false,
     });
     this.lambdaSecurityGroup = new ec2.SecurityGroup(
       this,
@@ -43,8 +43,8 @@ export class RdsStack extends cdk.Stack {
       vpc: this.vpc,
       vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
       securityGroups: [this.dbSecurityGroup],
-      credentials: rds.Credentials.fromGeneratedSecret("dbadmin"),
-      databaseName: "citymorph",
+      credentials: rds.Credentials.fromGeneratedSecret("db-admin"),
+      databaseName: "city-morph",
       publiclyAccessible: false,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       deleteAutomatedBackups: true,
