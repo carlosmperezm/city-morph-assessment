@@ -4,6 +4,7 @@ import { BackendStack } from "../lib/backend-stack";
 import { CognitoStack } from "../lib/cognito-stack";
 import { ApiStack } from "../lib/api-stack";
 import { RdsStack } from "../lib/rds-stack";
+import { S3Stack } from "../lib/s3-stack";
 
 const app = new cdk.App();
 
@@ -34,3 +35,10 @@ const apiStack = new ApiStack(app, "ApiStack", {
 });
 
 apiStack.addDependency(rdsStack);
+
+new S3Stack(app, "S3Stack", {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+});
