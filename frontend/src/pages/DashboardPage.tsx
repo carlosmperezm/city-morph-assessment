@@ -1,9 +1,13 @@
 import { useEffect, useState, type JSX } from "react";
 import { getDashboardData, getSignedImageUrls } from "../services/apiService";
 import type { DashboardData, SignedImage } from "../types";
-import { signOut } from "aws-amplify/auth";
+import { fetchUserAttributes, signOut } from "aws-amplify/auth";
+import type { UserAttributeKey } from "aws-amplify/auth";
 
 export default function DashboardPage(): JSX.Element {
+  const [user, setUser] = useState<Partial<
+    Record<UserAttributeKey, string>
+  > | null>(null);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null,
   );
@@ -27,7 +31,9 @@ export default function DashboardPage(): JSX.Element {
         );
         const imagesUrls = await getSignedImageUrls(imagesKeys);
         console.log("images urls: ", imagesUrls);
+        const currentUser = await fetchUserAttributes();
 
+        setUser(currentUser);
         setDashboardData(dashboardData);
         setProductImages(imagesUrls);
         setIsLoading(false);
@@ -53,6 +59,10 @@ export default function DashboardPage(): JSX.Element {
   if (!(dashboardData && productImages)) {
     return <h1>No data available</h1>;
   }
+  if (!user) {
+    return <h1>Login in first</h1>;
+  }
+  console.log("User: ", user);
   return (
     <div className="dashboard">
       <header>
@@ -60,7 +70,7 @@ export default function DashboardPage(): JSX.Element {
         <button onClick={handleSignout}>Sign Out</button>
       </header>
       <section className="user-section">
-        <h2>Hello {dashboardData.user.name}</h2>
+        <h2>Hello {user.name}</h2>
       </section>
       <section className="product-section">
         <ul>
@@ -72,7 +82,7 @@ export default function DashboardPage(): JSX.Element {
               (image) => image.key === product.image_key,
             );
             console.log("Image Data: ", imageData);
-            if (!imageData || dashboardData.user.role !== product.role) {
+            if (!imageData || user["custom:role"] !== product.role) {
               return null;
             }
             return (

@@ -21,6 +21,17 @@ export class CognitoStack extends cdk.Stack {
       signInAliases: { email: true },
       selfSignUpEnabled: true,
       autoVerify: { email: true },
+      standardAttributes: {
+        email: { required: true, mutable: true },
+        fullname: { required: true, mutable: true },
+      },
+      customAttributes: {
+        role: new cognito.StringAttribute({
+          minLen: 5,
+          maxLen: 10,
+          mutable: true,
+        }),
+      },
     });
 
     this.userPoolClient = new cognito.UserPoolClient(this, "UserPoolClient", {

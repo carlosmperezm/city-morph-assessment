@@ -22,10 +22,7 @@ export async function seedDb() {
         rejectUnauthorized: false,
       },
     });
-
     await pool.query(`
-      DROP TABLE IF EXISTS products;
-
       CREATE TABLE IF NOT EXISTS products (
         id SERIAL PRIMARY KEY,
         name VARCHAR(255) NOT NULL,

@@ -1,15 +1,18 @@
 import { useState, type JSX, type SubmitEvent, type ChangeEvent } from "react";
 import { signUp, signIn, confirmSignUp } from "aws-amplify/auth";
 import { Link, useNavigate, type NavigateFunction } from "react-router-dom";
+import type { Role } from "../types";
 
 export default function SignUpPage(): JSX.Element {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState<string>("");
+  const [role, setRole] = useState<Role>("standard");
   const [passwordMatch, setPasswordMatch] = useState<boolean>(false);
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const [confirmationCode, setConfirmationCode] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const navigate: NavigateFunction = useNavigate();
 
@@ -23,7 +26,7 @@ export default function SignUpPage(): JSX.Element {
         username: email,
         password,
         options: {
-          userAttributes: { email },
+          userAttributes: { email, name, "custom:role": role },
         },
       });
       setShowConfirmation(true);
@@ -84,6 +87,13 @@ export default function SignUpPage(): JSX.Element {
       {error && <p>Error:{error}</p>}
       <form onSubmit={handleSignUp}>
         <input
+          placeholder="Your Name"
+          type="text"
+          name="name"
+          required
+          onChange={(event) => setName(event.target.value)}
+        />
+        <input
           placeholder="email"
           type="email"
           name="email"
@@ -106,6 +116,33 @@ export default function SignUpPage(): JSX.Element {
           onChange={handleConfirmPassword}
           required
         />
+        <fieldset>
+          <legend>Select type of user:</legend>
+          <label>
+            <input
+              type="radio"
+              id="standard"
+              name="user-role"
+              value="standard"
+              checked={role === "standard"}
+              onChange={(e) => setRole(e.target.value as Role)}
+            />
+            Standard
+          </label>
+
+          <label>
+            <input
+              type="radio"
+              id="admin"
+              name="user-role"
+              value="admin"
+              checked={role === "admin"}
+              onChange={(e) => setRole(e.target.value as Role)}
+            />
+            Admin
+          </label>
+        </fieldset>
+
         <button type="submit" disabled={isLoading || !passwordMatch}>
           {isLoading
             ? "Signing up..."
