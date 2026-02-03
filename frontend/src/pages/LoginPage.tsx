@@ -1,0 +1,57 @@
+import { signIn } from "aws-amplify/auth";
+import { type JSX, useState, type SubmitEvent } from "react";
+import { Link, type NavigateFunction, useNavigate } from "react-router-dom";
+
+export function LoginPage(): JSX.Element {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
+  const navigate: NavigateFunction = useNavigate();
+
+  async function handleLogIn(
+    event: SubmitEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+    setIsLoading(true);
+    try {
+      await signIn({ username: email, password });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error to log in. Try again",
+      );
+    }
+  }
+
+  return (
+    <div>
+      <h1>Login</h1>
+      {error && <p>Error: {error}</p>}
+      <form onSubmit={handleLogIn}>
+        <input
+          placeholder="email"
+          type="email"
+          name="email"
+          required
+          onChange={(event) => setEmail(event.target.value)}
+          value={email}
+        />
+        <input
+          placeholder="password"
+          type="password"
+          name="password"
+          minLength={5}
+          onChange={(event) => setPassword(event.target.value)}
+          value={password}
+          required
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? "Logging In..." : "Log In"}
+        </button>
+      </form>
+      <Link to="/signup">Don't have an account? Sign Up</Link>
+    </div>
+  );
+}
