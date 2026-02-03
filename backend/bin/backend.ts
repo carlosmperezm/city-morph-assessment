@@ -26,8 +26,15 @@ const rdsStack = new RdsStack(app, "RdsStack", {
     region: process.env.CDK_DEFAULT_REGION,
   },
 });
+const s3Stack = new S3Stack(app, "S3Stack", {
+  env: {
+    account: process.env.CDK_DEFAULT_ACCOUNT,
+    region: process.env.CDK_DEFAULT_REGION,
+  },
+});
 const apiStack = new ApiStack(app, "ApiStack", {
   rdsStack,
+  s3Stack,
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
@@ -35,10 +42,3 @@ const apiStack = new ApiStack(app, "ApiStack", {
 });
 
 apiStack.addDependency(rdsStack);
-
-new S3Stack(app, "S3Stack", {
-  env: {
-    account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: process.env.CDK_DEFAULT_REGION,
-  },
-});

@@ -5,16 +5,18 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { RdsStack } from "./rds-stack";
+import { S3Stack } from "./s3-stack";
 
 export interface ApiStackProps extends cdk.StackProps {
   rdsStack: RdsStack;
+  s3Stack: S3Stack;
 }
 
 export class ApiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
 
-    const { rdsStack } = props;
+    const { rdsStack, s3Stack } = props;
 
     const dashboardFn = new lambdaNodejs.NodejsFunction(
       this,
@@ -33,8 +35,17 @@ export class ApiStack extends cdk.Stack {
         },
       },
     );
+    const imagesFn = new lambdaNodejs.NodejsFunction(this, "ImagesFunction", {
+      entry: "lambda/images/get-images.ts",
+      handler: "getImages",
+      runtime: lambda.Runtime.NODEJS_24_X,
+      environment: {
+        BUCKET_NAME: s3Stack.imageBucket.bucketName,
+      },
+    });
 
     rdsStack.dbInstance.secret?.grantRead(dashboardFn);
+    s3Stack.imageBucket.grantRead(imagesFn);
 
     const api = new apigateway.RestApi(this, "CityMorphApi", {
       restApiName: "city-morph-api",
@@ -46,6 +57,8 @@ export class ApiStack extends cdk.Stack {
 
     const dashboard = api.root.addResource("data");
     dashboard.addMethod("GET", new apigateway.LambdaIntegration(dashboardFn));
+    const images = api.root.addResource("images");
+    images.addMethod("GET", new apigateway.LambdaIntegration(imagesFn));
 
     new cdk.CfnOutput(this, "ApiUrl", {
       value: api.url,
