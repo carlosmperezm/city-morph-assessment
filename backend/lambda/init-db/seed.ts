@@ -29,6 +29,14 @@ export async function seedDb() {
       name VARCHAR(255) NOT NULL,
       image_key VARCHAR(255)
     );
+
+    INSERT INTO products(name,image_key)
+      VALUES
+        ('Product 1','images/product1.jpg'),
+        ('Product 2','images/product2.jpg'),
+        ('Product 3','images/product3.jpg'),
+        ('Product 4','images/product4.jpg')
+      ON CONFLICT DO NOTHING;
   `);
 
     await pool.end();
