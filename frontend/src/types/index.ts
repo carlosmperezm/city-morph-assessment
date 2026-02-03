@@ -10,7 +10,7 @@ export interface Product {
   description: string;
   image_key: string;
   price: number;
-  visible_to_role: "standard" | "admin";
+  role: "standard" | "admin";
 }
 export interface DashboardData {
   user: User;

@@ -72,11 +72,7 @@ export default function DashboardPage(): JSX.Element {
               (image) => image.key === product.image_key,
             );
             console.log("Image Data: ", imageData);
-            if (
-              !imageData ||
-              (dashboardData.user.role === "standard" &&
-                product.visible_to_role !== "standard")
-            ) {
+            if (!imageData || dashboardData.user.role !== product.role) {
               return null;
             }
             return (
