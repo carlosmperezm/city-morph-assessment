@@ -1,8 +1,10 @@
+export type Role = "standard" | "admin";
+
 export interface User {
   id: number;
   email: string;
   name: string;
-  role: "standard" | "admin";
+  role: Role;
 }
 export interface Product {
   id: number;
@@ -10,10 +12,9 @@ export interface Product {
   description: string;
   image_key: string;
   price: number;
-  role: "standard" | "admin";
+  role: Role;
 }
 export interface DashboardData {
-  user: User;
   products: Product[];
 }
 export interface SignedImage {

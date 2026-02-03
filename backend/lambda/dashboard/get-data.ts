@@ -62,11 +62,6 @@ export async function getData(
         "Access-Control-Allow-Origin": "http://localhost:5173",
       },
       body: JSON.stringify({
-        user: {
-          name: "Demo User",
-          email: "demo@example.com",
-          role: "standard",
-        },
         products: result.rows,
       }),
     };
