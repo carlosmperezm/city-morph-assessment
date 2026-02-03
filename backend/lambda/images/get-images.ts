@@ -27,7 +27,7 @@ export async function getImages(
       imageKeys.map(async (key) => {
         const command = new GetObjectCommand({ Bucket: bucketName, Key: key });
         const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
-        return { key, url };
+        return { key, signedUrl: url };
       }),
     );
     return {
