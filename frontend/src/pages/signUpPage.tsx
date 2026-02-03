@@ -1,5 +1,5 @@
 import { useState, type JSX, type SubmitEvent, type ChangeEvent } from "react";
-import { signUp, signIn } from "aws-amplify/auth";
+import { signUp, signIn, confirmSignUp } from "aws-amplify/auth";
 import { Link, useNavigate, type NavigateFunction } from "react-router-dom";
 
 export default function SignUpPage(): JSX.Element {
@@ -8,6 +8,8 @@ export default function SignUpPage(): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [passwordMatch, setPasswordMatch] = useState<boolean>(false);
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
+  const [confirmationCode, setConfirmationCode] = useState<string>("");
 
   const navigate: NavigateFunction = useNavigate();
 
@@ -20,10 +22,11 @@ export default function SignUpPage(): JSX.Element {
       await signUp({
         username: email,
         password,
+        options: {
+          userAttributes: { email },
+        },
       });
-
-      await signIn({ username: email, password });
-      navigate("/dashboard");
+      setShowConfirmation(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error signing up");
     } finally {
@@ -31,12 +34,48 @@ export default function SignUpPage(): JSX.Element {
     }
   }
 
-  function handleConfirmPassword(event: ChangeEvent<HTMLInputElement>): void {
-    if (event.target.value === password) {
-      setPasswordMatch(true);
-    } else {
-      setPasswordMatch(false);
+  async function handleConfirmSignUp(
+    event: SubmitEvent<HTMLFormElement>,
+  ): Promise<void> {
+    event.preventDefault();
+    setIsLoading(true);
+    try {
+      await confirmSignUp({
+        username: email,
+        confirmationCode,
+      });
+      await signIn({ username: email, password });
+      navigate("/dashboard");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error confirming signup");
+    } finally {
+      setIsLoading(false);
     }
+  }
+
+  function handleConfirmPassword(event: ChangeEvent<HTMLInputElement>): void {
+    setPasswordMatch(event.target.value === password);
+  }
+
+  if (showConfirmation) {
+    return (
+      <div>
+        <h1>Confirm your email</h1>
+        {error && <p>Error:{error}</p>}
+        <form onSubmit={handleConfirmSignUp}>
+          <input
+            placeholder="Confirmation code from email"
+            type="text"
+            value={confirmationCode}
+            onChange={(e) => setConfirmationCode(e.target.value)}
+            required
+          />
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Confirming..." : "Confirm"}
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (

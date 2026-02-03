@@ -50,8 +50,16 @@ export class ApiStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, "CityMorphApi", {
       restApiName: "city-morph-api",
       defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: ["GET", "OPTIONS"],
+        allowOrigins: ["http://localhost:5173"],
+        allowMethods: ["GET"],
+        allowHeaders: [
+          "Content-Type",
+          "Authorization",
+          "X-Amz-Date",
+          "X-Api-Key",
+          "X-Amz-Security-Token",
+        ],
+        allowCredentials: true,
       },
     });
 

@@ -33,7 +33,10 @@ export async function getImages(
     return {
       statusCode: 200,
       body: JSON.stringify(signedUrl),
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "http://localhost:5173",
+      },
     };
   } catch (error) {
     return {
