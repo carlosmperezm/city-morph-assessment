@@ -20,6 +20,3 @@ export interface SignedImage {
   key: string;
   signedUrl: string;
 }
-export interface ImagesResponse {
-  images: SignedImage[];
-}

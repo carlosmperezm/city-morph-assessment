@@ -1,5 +1,5 @@
 import { get } from "aws-amplify/api";
-import type { DashboardData, ImagesResponse } from "../types";
+import type { DashboardData, SignedImage } from "../types";
 
 const API_NAME: string = "cityMorphAPI";
 
@@ -12,7 +12,7 @@ export async function getDashboardData(): Promise<DashboardData> {
 
 export async function getSignedImageUrls(
   keys: string[],
-): Promise<ImagesResponse> {
+): Promise<SignedImage[]> {
   const path: string = "/images";
   const response = await get({
     apiName: API_NAME,
@@ -20,5 +20,5 @@ export async function getSignedImageUrls(
     options: { queryParams: { keys: keys.join(",") } },
   }).response;
   const data = (await response.body.json()) as unknown;
-  return data as ImagesResponse;
+  return data as SignedImage[];
 }

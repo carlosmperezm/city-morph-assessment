@@ -1,13 +1,13 @@
 import { useEffect, useState, type JSX } from "react";
 import { getDashboardData, getSignedImageUrls } from "../services/apiService";
-import type { DashboardData, ImagesResponse, SignedImage } from "../types";
+import type { DashboardData, SignedImage } from "../types";
 import { signOut } from "aws-amplify/auth";
 
 export default function DashboardPage(): JSX.Element {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null,
   );
-  const [productImages, setProductImages] = useState<ImagesResponse | null>(
+  const [productImages, setProductImages] = useState<SignedImage[] | null>(
     null,
   );
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -21,10 +21,12 @@ export default function DashboardPage(): JSX.Element {
     async function fetchData() {
       try {
         const dashboardData = await getDashboardData();
+        console.log(dashboardData);
         const imagesKeys: string[] = dashboardData.products.map(
           (product) => product.image_key,
         );
         const imagesUrls = await getSignedImageUrls(imagesKeys);
+        console.log("images urls: ", imagesUrls);
 
         setDashboardData(dashboardData);
         setProductImages(imagesUrls);
@@ -63,10 +65,13 @@ export default function DashboardPage(): JSX.Element {
       <section className="product-section">
         <ul>
           {dashboardData.products.map((product) => {
-            const imageData: SignedImage | undefined =
-              productImages.images.find(
-                (image) => image.key === product.image_key,
-              );
+            console.info("Iterating products: ");
+            console.log("Product: ", product);
+            console.log("Product Images: ", productImages);
+            const imageData: SignedImage | undefined = productImages.find(
+              (image) => image.key === product.image_key,
+            );
+            console.log("Image Data: ", imageData);
             if (
               !imageData ||
               (dashboardData.user.role === "standard" &&
