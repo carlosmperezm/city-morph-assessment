@@ -1,0 +1,16 @@
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    background-color: var(--color-primary);
+    color: var(--color-background);
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    text-align: left;
+}
+
+.userDetails {
+    text-align: left;
+}

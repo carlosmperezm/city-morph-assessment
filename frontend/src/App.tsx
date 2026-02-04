@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { fetchUserAttributes, type UserAttributeKey } from "aws-amplify/auth";
-import DashboardPage from "./pages/DashboardPage";
+import DashboardPage from "./pages/dashboard/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RouteNotExistsPage } from "./pages/RouteNotExistsPage";
 import { ErrorPage } from "./pages/ErrorPage";

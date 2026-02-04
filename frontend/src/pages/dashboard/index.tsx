@@ -1,8 +1,14 @@
 import { useEffect, useState, type JSX } from "react";
-import { getDashboardData, getSignedImageUrls } from "../services/apiService";
-import type { DashboardData, DashboardPageProps, SignedImage } from "../types";
-import { signOut } from "aws-amplify/auth";
-import { useNavigate, type NavigateFunction } from "react-router-dom";
+import {
+  getDashboardData,
+  getSignedImageUrls,
+} from "../../services/apiService";
+import type {
+  DashboardData,
+  DashboardPageProps,
+  SignedImage,
+} from "../../types";
+import Navbar from "../../components/navbar";
 
 export default function DashboardPage({
   user,
@@ -16,14 +22,6 @@ export default function DashboardPage({
   );
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
-  const navigate: NavigateFunction = useNavigate();
-
-  async function handleSignout(): Promise<void> {
-    await signOut();
-    await navigate("/login");
-    setUser(null);
-  }
 
   useEffect(() => {
     async function fetchData() {
@@ -67,9 +65,9 @@ export default function DashboardPage({
   console.log("User from dash: ", user);
   return (
     <div className="dashboard">
+      <Navbar user={user} setUser={setUser} />
       <header>
         <h1>City Morph Studio</h1>
-        <button onClick={handleSignout}>Sign Out</button>
       </header>
       <section className="user-section">
         <h2>Hello {user.name}</h2>
