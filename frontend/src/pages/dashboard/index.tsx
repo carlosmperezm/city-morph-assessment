@@ -9,6 +9,8 @@ import type {
   SignedImage,
 } from "../../types";
 import Navbar from "../../components/navbar";
+import styles from "./styles.module.css";
+import Product from "../../components/product";
 
 export default function DashboardPage({
   user,
@@ -62,26 +64,18 @@ export default function DashboardPage({
   if (!user) {
     return <h1>Login in first</h1>;
   }
-  console.log("User from dash: ", user);
   return (
-    <div className="dashboard">
+    <div>
       <Navbar user={user} setUser={setUser} />
       <header>
-        <h1>City Morph Studio</h1>
+        <h2>Products</h2>
       </header>
-      <section className="user-section">
-        <h2>Hello {user.name}</h2>
-      </section>
-      <section className="product-section">
-        <ul>
+      <section>
+        <ul className={styles.products}>
           {dashboardData.products.map((product) => {
-            console.info("Iterating products: ");
-            console.log("Product: ", product);
-            console.log("Product Images: ", productImages);
             const imageData: SignedImage | undefined = productImages.find(
               (image) => image.key === product.image_key,
             );
-            console.log("Image Data: ", imageData);
             if (
               !imageData ||
               (user["custom:role"] === "standard" &&
@@ -91,10 +85,7 @@ export default function DashboardPage({
             }
             return (
               <li key={product.id} className="product">
-                <img src={imageData.signedUrl} alt={product.name} />
-                <p className="product-name">{product.name}</p>
-                <p className="product-description">{product.description}</p>
-                <p className="product-price">{product.price}</p>
+                <Product product={product} signedUrl={imageData.signedUrl} />
               </li>
             );
           })}
