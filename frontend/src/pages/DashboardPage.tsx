@@ -84,7 +84,11 @@ export default function DashboardPage({
               (image) => image.key === product.image_key,
             );
             console.log("Image Data: ", imageData);
-            if (!imageData || user["custom:role"] !== product.role) {
+            if (
+              !imageData ||
+              (user["custom:role"] === "standard" &&
+                product.role !== "standard")
+            ) {
               return null;
             }
             return (

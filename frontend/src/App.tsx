@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import type { UserAttributeKey } from "aws-amplify/auth";
+import { fetchUserAttributes, type UserAttributeKey } from "aws-amplify/auth";
 import DashboardPage from "./pages/DashboardPage";
 import { LoginPage } from "./pages/LoginPage";
 import { RouteNotExistsPage } from "./pages/RouteNotExistsPage";
@@ -17,6 +17,8 @@ function App() {
   useEffect(() => {
     async function getUser() {
       try {
+        const currentUser = await fetchUserAttributes();
+        setUser(currentUser);
         setIsLoading(false);
       } catch {
         setIsLoading(false);
