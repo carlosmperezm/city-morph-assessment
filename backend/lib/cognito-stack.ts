@@ -1,6 +1,9 @@
 import * as cdk from "aws-cdk-lib";
 import { Construct } from "constructs";
 import * as cognito from "aws-cdk-lib/aws-cognito";
+import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as aws_iam from "aws-cdk-lib/aws-iam";
 
 export class CognitoStack extends cdk.Stack {
   public readonly userPool: cognito.UserPool;
@@ -33,6 +36,41 @@ export class CognitoStack extends cdk.Stack {
         }),
       },
     });
+
+    new cognito.CfnUserPoolGroup(this, "AdminGroup", {
+      userPoolId: this.userPool.userPoolId,
+      groupName: "Admin",
+      description: "Administrator group with full access",
+      precedence: 0,
+    });
+    new cognito.CfnUserPoolGroup(this, "StandardGroup", {
+      userPoolId: this.userPool.userPoolId,
+      groupName: "Standard",
+      description: "Standard user group with limited access",
+      precedence: 1,
+    });
+
+    const postConfirmationLambda = new lambdaNodejs.NodejsFunction(
+      this,
+      "PostConfirmationFunction",
+      {
+        entry: "lambda/auth/assign-groups.ts",
+        handler: "assignGroups",
+        runtime: lambda.Runtime.NODEJS_24_X,
+      },
+    );
+    postConfirmationLambda.addToRolePolicy(
+      new cdk.aws_iam.PolicyStatement({
+        effect: cdk.aws_iam.Effect.ALLOW,
+        actions: ["cognito-idp:AdminAddUserToGroup"],
+        resources: ["*"],
+      }),
+    );
+
+    this.userPool.addTrigger(
+      cognito.UserPoolOperation.POST_CONFIRMATION,
+      postConfirmationLambda,
+    );
 
     this.userPoolClient = new cognito.UserPoolClient(this, "UserPoolClient", {
       userPool: this.userPool,
