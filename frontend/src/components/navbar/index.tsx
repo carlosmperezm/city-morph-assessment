@@ -17,14 +17,31 @@ export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
     <nav className={styles.navbar}>
       <div>
         <h1>Hi {user.name}</h1>
-        <p>Role: {user["custom:role"]}</p>
+        <p>
+          <strong>Role</strong>: {user["custom:role"]}
+        </p>
       </div>
-      <div className={styles.userDetails}>
-        <p>Email: {user.email}</p>
-        <p>Email verified: {user.email_verified}</p>
-        <p>Account id: {user.sub}</p>
-        <button onClick={handleSignout}>Sign Out</button>
-      </div>
+      {user["custom:role"] === "admin" ? (
+        <div className={styles.userDetails}>
+          <p>
+            <strong>Email</strong>: {user.email}
+          </p>
+          <p>
+            <strong>Email verified</strong>: {user.email_verified}
+          </p>
+          <p>
+            <strong>Account id</strong>: {user.sub}
+          </p>
+          <button onClick={handleSignout}>Sign Out</button>
+        </div>
+      ) : (
+        <div className={styles.userDetails}>
+          <p>
+            <strong>Email</strong>: {user.email}
+          </p>
+          <button onClick={handleSignout}>Sign Out</button>
+        </div>
+      )}
     </nav>
   );
 }
