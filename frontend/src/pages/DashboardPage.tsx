@@ -1,13 +1,13 @@
 import { useEffect, useState, type JSX } from "react";
 import { getDashboardData, getSignedImageUrls } from "../services/apiService";
-import type { DashboardData, SignedImage } from "../types";
-import { fetchUserAttributes, signOut } from "aws-amplify/auth";
-import type { UserAttributeKey } from "aws-amplify/auth";
+import type { DashboardData, DashboardPageProps, SignedImage } from "../types";
+import { signOut } from "aws-amplify/auth";
+import { useNavigate, type NavigateFunction } from "react-router-dom";
 
-export default function DashboardPage(): JSX.Element {
-  const [user, setUser] = useState<Partial<
-    Record<UserAttributeKey, string>
-  > | null>(null);
+export default function DashboardPage({
+  user,
+  setUser,
+}: DashboardPageProps): JSX.Element {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(
     null,
   );
@@ -17,8 +17,12 @@ export default function DashboardPage(): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  const navigate: NavigateFunction = useNavigate();
+
   async function handleSignout(): Promise<void> {
-    return await signOut();
+    await signOut();
+    await navigate("/login");
+    setUser(null);
   }
 
   useEffect(() => {
@@ -31,9 +35,7 @@ export default function DashboardPage(): JSX.Element {
         );
         const imagesUrls = await getSignedImageUrls(imagesKeys);
         console.log("images urls: ", imagesUrls);
-        const currentUser = await fetchUserAttributes();
 
-        setUser(currentUser);
         setDashboardData(dashboardData);
         setProductImages(imagesUrls);
         setIsLoading(false);
@@ -48,7 +50,7 @@ export default function DashboardPage(): JSX.Element {
       }
     }
     fetchData();
-  }, []);
+  }, [user]);
 
   if (isLoading) {
     return <h1>Loading</h1>;
@@ -62,7 +64,7 @@ export default function DashboardPage(): JSX.Element {
   if (!user) {
     return <h1>Login in first</h1>;
   }
-  console.log("User: ", user);
+  console.log("User from dash: ", user);
   return (
     <div className="dashboard">
       <header>

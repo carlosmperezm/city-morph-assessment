@@ -1,8 +1,9 @@
-import { signIn } from "aws-amplify/auth";
+import { fetchUserAttributes, signIn } from "aws-amplify/auth";
 import { type JSX, useState, type SubmitEvent } from "react";
 import { Link, type NavigateFunction, useNavigate } from "react-router-dom";
+import type { LoginPageProps } from "../types";
 
-export function LoginPage(): JSX.Element {
+export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState<string>("");
@@ -17,7 +18,9 @@ export function LoginPage(): JSX.Element {
     setIsLoading(true);
     try {
       await signIn({ username: email, password });
-      navigate("/dashboard");
+      const currentUser = await fetchUserAttributes();
+      setUser(currentUser);
+      await navigate("/dashboard");
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Error to log in. Try again",

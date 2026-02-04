@@ -1,9 +1,14 @@
 import { useState, type JSX, type SubmitEvent, type ChangeEvent } from "react";
-import { signUp, signIn, confirmSignUp } from "aws-amplify/auth";
+import {
+  signUp,
+  signIn,
+  confirmSignUp,
+  fetchUserAttributes,
+} from "aws-amplify/auth";
 import { Link, useNavigate, type NavigateFunction } from "react-router-dom";
-import type { Role } from "../types";
+import type { Role, SignUpPageProps } from "../types";
 
-export default function SignUpPage(): JSX.Element {
+export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [name, setName] = useState<string>("");
@@ -48,7 +53,9 @@ export default function SignUpPage(): JSX.Element {
         confirmationCode,
       });
       await signIn({ username: email, password });
-      navigate("/dashboard");
+      const currentUser = await fetchUserAttributes();
+      setUser(currentUser);
+      navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error confirming signup");
     } finally {
