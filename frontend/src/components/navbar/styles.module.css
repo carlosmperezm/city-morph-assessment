@@ -1,17 +1,25 @@
+.navbarContainer {
+    position: sticky;
+    top: 0;
+    left: 0;
+}
+
 .navbar {
     display: flex;
     justify-content: space-around;
     background-color: var(--color-primary);
     color: var(--color-background);
-    position: sticky;
-    top: 0;
-    left: 0;
     padding: 1rem;
     text-align: left;
-    overflow: hidden;
     gap: 1rem;
 }
 
+.warning {
+    background-color: var(--color-warning);
+    padding: 1rem;
+    font-weight: bold;
+    position: sticky;
+}
 
 @media screen and (width< 600px) {
     .navbar {

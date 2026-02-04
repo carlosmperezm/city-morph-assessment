@@ -7,6 +7,8 @@ import styles from "./styles.module.css";
 export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
   const navigate = useNavigate();
 
+  const isUserAdmin: boolean = user["custom:role"] === "admin";
+
   async function handleSignout(): Promise<void> {
     await signOut();
     await navigate("/login");
@@ -14,34 +16,41 @@ export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
   }
 
   return (
-    <nav className={styles.navbar}>
-      <div>
-        <h1>Hi {user.name}</h1>
-        <p>
-          <strong>Role</strong>: {user["custom:role"]}
-        </p>
-      </div>
-      {user["custom:role"] === "admin" ? (
-        <div className={styles.userDetails}>
+    <div className={styles.navbarContainer}>
+      <nav className={styles.navbar}>
+        <div>
+          <h1>Hi {user.name}</h1>
           <p>
-            <strong>Email</strong>: {user.email}
+            <strong>Role</strong>: {user["custom:role"]}
           </p>
-          <p>
-            <strong>Email verified</strong>: {user.email_verified}
-          </p>
-          <p>
-            <strong>Account id</strong>: {user.sub}
-          </p>
-          <button onClick={handleSignout}>Sign Out</button>
         </div>
-      ) : (
-        <div className={styles.userDetails}>
-          <p>
-            <strong>Email</strong>: {user.email}
-          </p>
-          <button onClick={handleSignout}>Sign Out</button>
+        {isUserAdmin ? (
+          <div className={styles.userDetails}>
+            <p>
+              <strong>Email</strong>: {user.email}
+            </p>
+            <p>
+              <strong>Email verified</strong>: {user.email_verified}
+            </p>
+            <p>
+              <strong>Account id</strong>: {user.sub}
+            </p>
+            <button onClick={handleSignout}>Sign Out</button>
+          </div>
+        ) : (
+          <div className={styles.userDetails}>
+            <p>
+              <strong>Email</strong>: {user.email}
+            </p>
+            <button onClick={handleSignout}>Sign Out</button>
+          </div>
+        )}
+      </nav>
+      {!isUserAdmin && (
+        <div className={styles.warning}>
+          Data is limited due to user's permissions
         </div>
       )}
-    </nav>
+    </div>
   );
 }
