@@ -23,21 +23,30 @@ export async function seedDb() {
       },
     });
     await pool.query(`
+      DROP TABLE IF EXISTS products;
+      
       CREATE TABLE IF NOT EXISTS products (
-        id SERIAL PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        image_key VARCHAR(255),
-        role VARCHAR(255)
-    );
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL,
+      price FLOAT DEFAULT 0.00,
+      image_key VARCHAR(255),
+      role VARCHAR(255)
+      );
 
-      INSERT INTO products(name,image_key, role)
-        VALUES
-          ('Product 1','images/product1.jpg', 'standard'),
-          ('Product 2','images/product2.jpg', 'admin'),
-          ('Product 3','images/product3.jpg', 'admin'),
-          ('Product 4','images/product4.jpg', 'standard')
-        ON CONFLICT DO NOTHING;
-  `);
+      INSERT INTO products(name, price, image_key, role)
+      VALUES
+      ('AirPods', 10.99, 'images/AirPods.jpg', 'admin'),
+      ('Lotion', 2.89, 'images/Lotion.jpg', 'standard'),
+      ('Perfume', 47.81, 'images/Perfume.jpg', 'admin'),
+      ('Shoes', 65.00, 'images/Shoes.jpg', 'standard'),
+      ('Watch', 15.50, 'images/Watch.jpg', 'admin'),
+      ('Headphones', 89.99, 'images/Headphones.jpg', 'standard'),
+      ('Keyboard', 75.00, 'images/Keyboard.jpg', 'admin'),
+      ('Sandals', 35.00, 'images/Sandals.jpg', 'standard'),
+      ('Coffee Maker', 99.99, 'images/Coffee Maker.jpg', 'admin'),
+      ('Women Accessories', 45.00, 'images/Women Accessories.jpg', 'standard')
+      ON CONFLICT DO NOTHING;
+    `);
 
     await pool.end();
     return { statusCode: 200, body: "DB initialized" };

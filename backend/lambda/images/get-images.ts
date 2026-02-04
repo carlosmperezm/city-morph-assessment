@@ -10,10 +10,16 @@ export async function getImages(
   try {
     const bucketName: string | undefined = process.env.BUCKET_NAME;
     const imageKeys: string[] = [
-      "images/product1.jpg",
-      "images/product2.jpg",
-      "images/product3.jpg",
-      "images/product4.jpg",
+      "images/Airpods.jpg",
+      "images/Lotion.jpg",
+      "images/Perfume.jpg",
+      "images/Shoes.jpg",
+      "images/Watch.jpg",
+      "images/Headphones.jpg",
+      "images/Keyboard.jpg",
+      "images/Sandals.jpg",
+      "images/Coffee Maker.jpg",
+      "images/Women Accessories.jpg",
     ];
     if (!bucketName) {
       return {
