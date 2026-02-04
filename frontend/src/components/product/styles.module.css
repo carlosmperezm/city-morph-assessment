@@ -1,0 +1,9 @@
+.product {
+    background-color: var(--color-secondary);
+    padding: 1rem;
+}
+
+.image {
+    width: 100%;
+    height: 300px;
+}
