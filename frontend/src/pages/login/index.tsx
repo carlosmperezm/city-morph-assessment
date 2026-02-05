@@ -31,7 +31,7 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
 
   return (
     <div className={styles.container}>
-      {error && <p>Error: {error}</p>}
+      {error && <p className={styles.error}>Error:{error}</p>}
       <form onSubmit={handleLogIn} className={styles.form}>
         <h1>Login</h1>
         <input
