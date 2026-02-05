@@ -27,4 +27,8 @@
         text-align: center;
         gap: unset;
     }
+
+    .navbar h1 {
+        font-size: 1rem;
+    }
 }

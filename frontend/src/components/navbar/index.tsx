@@ -19,7 +19,7 @@ export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
     <div className={styles.navbarContainer}>
       <nav className={styles.navbar}>
         <div>
-          <h1>Hi {user.name}</h1>
+          <h1>Welcome {user.name}</h1>
           <p>
             <strong>Role</strong>: {user["custom:role"]}
           </p>

@@ -11,6 +11,7 @@ import type {
 import Navbar from "../../components/navbar";
 import styles from "./styles.module.css";
 import Product from "../../components/product";
+import { ThreeDot } from "react-loading-indicators";
 
 export default function DashboardPage({
   user,
@@ -53,7 +54,7 @@ export default function DashboardPage({
   }, [user]);
 
   if (isLoading) {
-    return <h1>Loading</h1>;
+    return <ThreeDot color="#3b82f6" size="medium" text="" textColor="" />;
   }
   if (error) {
     return <h1>{error}</h1>;
@@ -85,7 +86,11 @@ export default function DashboardPage({
             }
             return (
               <li key={product.id} className="product">
-                <Product product={product} signedUrl={imageData.signedUrl} />
+                <Product
+                  product={product}
+                  signedUrl={imageData.signedUrl}
+                  user={user}
+                />
               </li>
             );
           })}

@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { fetchUserAttributes, type UserAttributeKey } from "aws-amplify/auth";
-import DashboardPage from "./pages/dashboard/DashboardPage";
-import { LoginPage } from "./pages/LoginPage";
+import DashboardPage from "./pages/dashboard";
+import { LoginPage } from "./pages/login";
 import { RouteNotExistsPage } from "./pages/RouteNotExistsPage";
 import { ErrorPage } from "./pages/ErrorPage";
-import SignUpPage from "./pages/signUpPage";
+import SignUpPage from "./pages/sign-up";
+import { ThreeDot } from "react-loading-indicators";
 
 function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,7 +30,7 @@ function App() {
   }, []);
 
   if (isLoading) {
-    return <h1>Loading</h1>;
+    return <ThreeDot color="#3b82f6" size="medium" text="" textColor="" />;
   }
 
   return (

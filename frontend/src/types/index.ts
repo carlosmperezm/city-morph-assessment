@@ -1,4 +1,5 @@
 import type { UserAttributeKey } from "aws-amplify/auth";
+import type { Dispatch, SetStateAction } from "react";
 
 export type Role = "standard" | "admin";
 export interface User {
@@ -24,16 +25,29 @@ export interface SignedImage {
 }
 export interface DashboardPageProps {
   user: Partial<Record<UserAttributeKey, string>>;
-  setUser: (user: Partial<Record<UserAttributeKey, string>> | null) => null;
+  setUser: Dispatch<
+    SetStateAction<Partial<Record<UserAttributeKey, string>> | null>
+  >;
 }
 export interface LoginPageProps {
-  setUser: (user: Partial<Record<UserAttributeKey, string>> | null) => null;
+  setUser: Dispatch<
+    SetStateAction<Partial<Record<UserAttributeKey, string>> | null>
+  >;
 }
 
 export interface SignUpPageProps {
-  setUser: (user: Partial<Record<UserAttributeKey, string>> | null) => null;
+  setUser: Dispatch<
+    SetStateAction<Partial<Record<UserAttributeKey, string>> | null>
+  >;
 }
 export interface NavbarProps {
   user: Partial<Record<UserAttributeKey, string>>;
-  setUser: (user: Partial<Record<UserAttributeKey, string>> | null) => null;
+  setUser: Dispatch<
+    SetStateAction<Partial<Record<UserAttributeKey, string>> | null>
+  >;
+}
+export interface ProductProps {
+  product: Product;
+  signedUrl: string;
+  user: Partial<Record<UserAttributeKey, string>>;
 }
