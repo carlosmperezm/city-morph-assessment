@@ -1,0 +1,38 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+*:user-invalid {
+    border-color: var(--color-error);
+}
+
+.form {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: min(90vw, 500px);
+    height: 500px;
+    background-color: aliceblue;
+    border-radius: 1px solid var(--radius);
+}
+
+.form input {
+    width: 80%;
+    padding: 1rem;
+}
+
+.form button {
+    border: 1px solid var(--color-border);
+}
+
+button:disabled:hover {
+    cursor: not-allowed;
+}
