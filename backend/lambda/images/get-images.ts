@@ -6,6 +6,7 @@ const s3Client = new S3Client();
 const allowedOrigins = [
   "http://localhost:5173",
   "http://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
+  "https://d3i40ylfe83sb1.cloudfront.net",
 ];
 
 export async function getImages(

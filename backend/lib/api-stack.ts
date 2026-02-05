@@ -54,6 +54,7 @@ export class ApiStack extends cdk.Stack {
           "http://localhost:5173",
           "https://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
           "http://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
+          "https://d3i40ylfe83sb1.cloudfront.net",
         ],
         allowMethods: ["GET"],
         allowHeaders: [
