@@ -29,9 +29,24 @@
 }
 
 * {
-
   padding: 0;
 }
+
+*:focus {
+  outline-color: var(--color-primary);
+}
+
+input,
+button {
+  border-radius: var(--radius);
+  border: 1px solid var(--color-secondary);
+}
+
+*:user-invalid {
+  border-color: var(--color-error);
+  border-radius: var(--radius);
+}
+
 
 a {
   font-weight: 500;
@@ -40,7 +55,7 @@ a {
 }
 
 a:hover {
-  color: #747bff;
+  color: var(--color-primary);
 }
 
 body {
@@ -69,7 +84,7 @@ button {
 }
 
 button:hover {
-  border-color: #646cff;
+  border-color: var(--color-primary);
 }
 
 button:focus,

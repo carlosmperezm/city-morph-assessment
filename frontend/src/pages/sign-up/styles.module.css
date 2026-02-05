@@ -29,7 +29,8 @@
     padding: 1rem;
 }
 
-.form button .confirmationForm button {
+.form button .confirmationForm button,
+form fieldset {
     border: 1px solid var(--color-border);
 }
 
@@ -50,8 +51,13 @@ button:disabled:hover {
 
 .confirmationForm input {
     padding: 0.5rem;
+    /* border-radius: 1px solid; */
 }
 
 .error {
     color: var(--color-error);
+}
+
+.form fieldset legend {
+    background-color: var(--color-secondary);
 }

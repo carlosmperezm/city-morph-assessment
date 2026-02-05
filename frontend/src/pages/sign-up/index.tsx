@@ -36,6 +36,7 @@ export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
         },
       });
       setShowConfirmation(true);
+      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error signing up");
     } finally {
@@ -78,13 +79,17 @@ export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
           className={styles.confirmationForm}
         >
           <input
-            placeholder="Confirmation code from email"
+            placeholder="Confirmation code"
             type="text"
+            minLength={6}
             value={confirmationCode}
             onChange={(e) => setConfirmationCode(e.target.value)}
             required
           />
-          <button type="submit" disabled={isLoading}>
+          <button
+            type="submit"
+            disabled={isLoading || confirmationCode.length < 6}
+          >
             {isLoading ? "Confirming..." : "Confirm"}
           </button>
         </form>

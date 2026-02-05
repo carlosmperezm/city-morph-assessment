@@ -26,6 +26,8 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
       setError(
         err instanceof Error ? err.message : "Error to log in. Try again",
       );
+    } finally {
+      setIsLoading(false);
     }
   }
 
