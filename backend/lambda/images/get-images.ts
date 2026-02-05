@@ -3,10 +3,18 @@ import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
 const s3Client = new S3Client();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
+];
 
 export async function getImages(
   event: lambda.APIGatewayProxyEvent,
 ): Promise<lambda.APIGatewayProxyResult> {
+  const origin = event.headers.origin || event.headers.Origin || "";
+  const corsOrigin = allowedOrigins.includes(origin)
+    ? origin
+    : allowedOrigins[0];
   try {
     const bucketName: string | undefined = process.env.BUCKET_NAME;
     const imageKeys: string[] = [
@@ -41,7 +49,7 @@ export async function getImages(
       body: JSON.stringify(signedUrl),
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost:5173",
+        "Access-Control-Allow-Origin": corsOrigin,
       },
     };
   } catch (error) {

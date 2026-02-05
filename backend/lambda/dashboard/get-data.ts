@@ -46,20 +46,28 @@ async function getDbPool(): Promise<Pool> {
 
   return dbPool;
 }
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
+];
 
 export async function getData(
   event: lambda.APIGatewayProxyEvent,
 ): Promise<lambda.APIGatewayProxyResult> {
   try {
     const pool = await getDbPool();
-
     const result = await pool.query("SELECT * FROM products ");
+
+    const origin = event.headers.origin || event.headers.Origin || "";
+    const corsOrigin = allowedOrigins.includes(origin)
+      ? origin
+      : allowedOrigins[0];
 
     return {
       statusCode: 200,
       headers: {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost:5173",
+        "Access-Control-Allow-Origin": corsOrigin,
       },
       body: JSON.stringify({
         products: result.rows,
@@ -71,7 +79,7 @@ export async function getData(
       statusCode: 400,
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        error: "Internal server error",
+        error: "Oops there's an error",
         message: error instanceof Error ? error.message : "Unknown error",
       }),
     };

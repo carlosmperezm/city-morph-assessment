@@ -44,7 +44,7 @@ export async function seedDb() {
       ('Keyboard', 75.00, 'images/Keyboard.jpg', 'admin'),
       ('Sandals', 35.00, 'images/Sandals.jpg', 'standard'),
       ('Coffee Maker', 99.99, 'images/Coffee Maker.jpg', 'admin'),
-      ('Women Accessories', 45.00, 'images/Women Accessories.jpg', 'standard')
+      ('Women Accessories', 45.00, 'images/Women Accessories.jpg', 'admin')
       ON CONFLICT DO NOTHING;
     `);
 
