@@ -29,7 +29,7 @@ jobs:
         working-directory: ./frontend
         env:
           VITE_USER_POOL_ID: ${{ secrets.VITE_USER_POOL_ID }}
-          VITE_CLIENT_ID: ${{ secrets.VITE_USER_POOL_CLIENT_ID }}
+          VITE_CLIENT_ID: ${{ secrets.VITE_CLIENT_ID }}
           VITE_AWS_REGION: us-west-1
           VITE_API_ENDPOINT: ${{ secrets.VITE_API_ENDPOINT }}
         run: npm run build
