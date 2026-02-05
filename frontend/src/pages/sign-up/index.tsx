@@ -70,10 +70,13 @@ export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
 
   if (showConfirmation) {
     return (
-      <div>
+      <div className={styles.container}>
         <h1>Confirm your email</h1>
-        {error && <p>Error:{error}</p>}
-        <form onSubmit={handleConfirmSignUp}>
+        {error && <p className={styles.error}>Error:{error}</p>}
+        <form
+          onSubmit={handleConfirmSignUp}
+          className={styles.confirmationForm}
+        >
           <input
             placeholder="Confirmation code from email"
             type="text"
@@ -92,7 +95,7 @@ export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
   return (
     <div className={styles.container}>
       <h1>Let's create you an account</h1>
-      {error && <p>Error:{error}</p>}
+      {error && <p className={styles.error}>Error:{error}</p>}
       <form onSubmit={handleSignUp} className={styles.form}>
         <input
           placeholder="Your Name"

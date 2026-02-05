@@ -29,10 +29,30 @@
     padding: 1rem;
 }
 
-.form button {
+.form button .confirmationForm button {
     border: 1px solid var(--color-border);
 }
 
 button:disabled:hover {
     cursor: not-allowed;
+}
+
+.confirmationForm {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: min(90vw, 500px);
+    height: 500px;
+    background-color: aliceblue;
+    border-radius: 1px solid var(--radius);
+}
+
+.confirmationForm input {
+    padding: 0.5rem;
+}
+
+.error {
+    color: var(--color-error);
+
 }
