@@ -92,3 +92,16 @@ button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
+
+form button {
+  background-color: var(--color-primary);
+  color: var(--color-background);
+}
+
+button:disabled {
+  background-color: var(--color-border);
+}
+
+form input {
+  font-size: 18px;
+}

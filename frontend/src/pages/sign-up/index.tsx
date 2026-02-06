@@ -162,7 +162,7 @@ export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
         <button type="submit" disabled={isLoading || !passwordMatch}>
           {isLoading
             ? "Signing up..."
-            : !passwordMatch
+            : !passwordMatch && password
               ? "Passwords do not match"
               : "Sign Up"}
         </button>
