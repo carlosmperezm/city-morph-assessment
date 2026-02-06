@@ -21,6 +21,19 @@
     position: sticky;
 }
 
+.userDetails.show {
+    display: block;
+}
+
+.userDetails {
+    display: none;
+}
+
+.dropdown {
+    display: none;
+}
+
+
 @media screen and (width< 600px) {
     .navbar {
         flex-direction: column;
@@ -31,4 +44,20 @@
     .navbar h1 {
         font-size: 1rem;
     }
+
+    .navbar>div:first-child {
+        display: flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    .dropdown {
+        display: block;
+        font-size: 2rem;
+    }
+
+}
+
+@keyframes move-in {
+    from {}
 }

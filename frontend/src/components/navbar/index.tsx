@@ -1,13 +1,15 @@
 import type { NavbarProps } from "../../types";
-import { type JSX } from "react";
+import { useState, type JSX } from "react";
 import { signOut } from "aws-amplify/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, type NavigateFunction } from "react-router-dom";
 import styles from "./styles.module.css";
 
 export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
-  const navigate = useNavigate();
+  const [extendNavbar, setExtendNavbar] = useState<boolean>(true);
+  const navigate: NavigateFunction = useNavigate();
 
   const isUserAdmin: boolean = user["custom:role"] === "admin";
+  const dynamicClasses: string = `${styles.userDetails} ${extendNavbar ? `${styles.show}` : `${styles.noShow}`}`;
 
   async function handleSignout(): Promise<void> {
     await signOut();
@@ -23,9 +25,15 @@ export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
           <p>
             <strong>Role</strong>: {user["custom:role"]}
           </p>
+          <span
+            className={styles.dropdown}
+            onClick={() => setExtendNavbar(!extendNavbar)}
+          >
+            {extendNavbar ? "↑" : "↓"}
+          </span>
         </div>
         {isUserAdmin ? (
-          <div className={styles.userDetails}>
+          <div className={dynamicClasses}>
             <p>
               <strong>Email</strong>: {user.email}
             </p>
@@ -38,7 +46,7 @@ export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
             <button onClick={handleSignout}>Sign Out</button>
           </div>
         ) : (
-          <div className={styles.userDetails}>
+          <div className={dynamicClasses}>
             <p>
               <strong>Email</strong>: {user.email}
             </p>
