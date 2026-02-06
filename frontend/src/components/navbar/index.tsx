@@ -3,6 +3,7 @@ import { useState, type JSX } from "react";
 import { signOut } from "aws-amplify/auth";
 import { useNavigate, type NavigateFunction } from "react-router-dom";
 import styles from "./styles.module.css";
+import { FiArrowDownCircle, FiArrowUpCircle } from "react-icons/fi";
 
 export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
   const [extendNavbar, setExtendNavbar] = useState<boolean>(true);
@@ -29,7 +30,7 @@ export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
             className={styles.dropdown}
             onClick={() => setExtendNavbar(!extendNavbar)}
           >
-            {extendNavbar ? "↑" : "↓"}
+            {extendNavbar ? <FiArrowUpCircle /> : <FiArrowDownCircle />}
           </span>
         </div>
         {isUserAdmin ? (
