@@ -49,11 +49,14 @@
         display: flex;
         justify-content: space-around;
         align-items: center;
+        gap: 1rem;
     }
 
     .dropdown {
         display: block;
         font-size: 2rem;
+        justify-self: center;
+        transform: translateY(5px);
     }
 
 }
