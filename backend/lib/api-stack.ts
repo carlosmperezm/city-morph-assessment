@@ -6,6 +6,7 @@ import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import { RdsStack } from "./rds-stack";
 import { S3Stack } from "./s3-stack";
+import { allowedOrigins } from "../lambda/shared/cors";
 
 export interface ApiStackProps extends cdk.StackProps {
   rdsStack: RdsStack;
@@ -50,12 +51,7 @@ export class ApiStack extends cdk.Stack {
     const api = new apigateway.RestApi(this, "CityMorphApi", {
       restApiName: "city-morph-api",
       defaultCorsPreflightOptions: {
-        allowOrigins: [
-          "http://localhost:5173",
-          "https://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
-          "http://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
-          "https://d3i40ylfe83sb1.cloudfront.net",
-        ],
+        allowOrigins: allowedOrigins,
         allowMethods: ["GET"],
         allowHeaders: [
           "Content-Type",

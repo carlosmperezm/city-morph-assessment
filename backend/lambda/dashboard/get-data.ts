@@ -4,6 +4,7 @@ import {
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
 import { Pool } from "pg";
+import { allowedOrigins } from "../shared/cors";
 
 const secretsClient = new SecretsManagerClient();
 let dbPool: Pool | null = null;
@@ -46,11 +47,6 @@ async function getDbPool(): Promise<Pool> {
 
   return dbPool;
 }
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://city-morph-assessment.s3-website-us-west-1.amazonaws.com",
-  "https://d3i40ylfe83sb1.cloudfront.net",
-];
 
 export async function getData(
   event: lambda.APIGatewayProxyEvent,
