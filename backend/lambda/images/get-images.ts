@@ -12,36 +12,53 @@ const allowedOrigins = [
 export async function getImages(
   event: lambda.APIGatewayProxyEvent,
 ): Promise<lambda.APIGatewayProxyResult> {
-  const origin = event.headers.origin || event.headers.Origin || "";
-  const corsOrigin = allowedOrigins.includes(origin)
+  const origin: string = event.headers.origin || event.headers.Origin || "";
+  const corsOrigin: string = allowedOrigins.includes(origin)
     ? origin
     : allowedOrigins[0];
   try {
     const bucketName: string | undefined = process.env.BUCKET_NAME;
-    const imageKeys: string[] = [
-      "images/Airpods.jpg",
-      "images/Lotion.jpg",
-      "images/Perfume.jpg",
-      "images/Shoes.jpg",
-      "images/Watch.jpg",
-      "images/Headphones.jpg",
-      "images/Keyboard.jpg",
-      "images/Sandals.jpg",
-      "images/Coffee Maker.jpg",
-      "images/Women Accessories.jpg",
-    ];
+    const keysParam: string | undefined =
+      event.queryStringParameters?.keys?.trim();
+    const imageKeys: string[] = keysParam
+      ? keysParam
+          .split(",")
+          .map((k) => k.trim())
+          .filter(Boolean)
+      : [];
+
     if (!bucketName) {
       return {
         statusCode: 400,
         body: JSON.stringify({
           error: "Bucket name is needed from env variables",
         }),
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": corsOrigin,
+        },
       };
     }
+    if (imageKeys.length === 0) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: "No image keys provided" }),
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": corsOrigin,
+        },
+      };
+    }
+
     const signedUrl = await Promise.all(
       imageKeys.map(async (key) => {
-        const command = new GetObjectCommand({ Bucket: bucketName, Key: key });
-        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+        const command: GetObjectCommand = new GetObjectCommand({
+          Bucket: bucketName,
+          Key: key,
+        });
+        const url: string = await getSignedUrl(s3Client, command, {
+          expiresIn: 3600,
+        });
         return { key, signedUrl: url };
       }),
     );
@@ -57,6 +74,10 @@ export async function getImages(
     return {
       statusCode: 400,
       body: JSON.stringify({ error: String(error) }),
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": corsOrigin,
+      },
     };
   }
 }
