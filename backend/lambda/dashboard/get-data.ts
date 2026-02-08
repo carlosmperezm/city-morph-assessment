@@ -2,34 +2,33 @@ import * as lambda from "aws-lambda";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
+  GetSecretValueCommandOutput,
 } from "@aws-sdk/client-secrets-manager";
-import { Pool } from "pg";
+import { Pool, QueryResult } from "pg";
 import { allowedOrigins } from "../shared/cors";
+import { isValidDbSecret } from "../shared/validators";
 
-const secretsClient = new SecretsManagerClient();
+const secretsClient: SecretsManagerClient = new SecretsManagerClient();
 let dbPool: Pool | null = null;
-
-interface DbSecret {
-  username: string;
-  password: string;
-  host: string;
-  port: number;
-  dbname: string;
-}
 
 async function getDbPool(): Promise<Pool> {
   if (dbPool) return dbPool;
 
-  const secretArn = process.env.DB_SECRET_ARN;
+  const secretArn: string | undefined = process.env.DB_SECRET_ARN;
+
   if (!secretArn) throw new Error("DB_SECRET_ARN not set");
 
-  const response = await secretsClient.send(
+  const response: GetSecretValueCommandOutput = await secretsClient.send(
     new GetSecretValueCommand({ SecretId: secretArn }),
   );
 
   if (!response.SecretString) throw new Error("Secret not found");
 
-  const secret: DbSecret = JSON.parse(response.SecretString);
+  const secret: unknown = JSON.parse(response.SecretString);
+
+  if (!isValidDbSecret(secret)) {
+    throw new Error("Invalid secret format");
+  }
 
   dbPool = new Pool({
     host: secret.host,
@@ -51,14 +50,14 @@ async function getDbPool(): Promise<Pool> {
 export async function getData(
   event: lambda.APIGatewayProxyEvent,
 ): Promise<lambda.APIGatewayProxyResult> {
-  try {
-    const pool = await getDbPool();
-    const result = await pool.query("SELECT * FROM products ");
+  const origin: string = event.headers.origin || event.headers.Origin || "";
+  const corsOrigin: string = allowedOrigins.includes(origin)
+    ? origin
+    : allowedOrigins[0];
 
-    const origin = event.headers.origin || event.headers.Origin || "";
-    const corsOrigin = allowedOrigins.includes(origin)
-      ? origin
-      : allowedOrigins[0];
+  try {
+    const pool: Pool = await getDbPool();
+    const result: QueryResult = await pool.query("SELECT * FROM products ");
 
     return {
       statusCode: 200,
@@ -71,13 +70,15 @@ export async function getData(
       }),
     };
   } catch (error) {
-    console.error("Error:", error);
     return {
-      statusCode: 400,
-      headers: { "Content-Type": "application/json" },
+      statusCode: 500,
+      headers: {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": corsOrigin,
+      },
       body: JSON.stringify({
         error: "Oops there's an error",
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: error instanceof Error ? error.message : String(error),
       }),
     };
   }

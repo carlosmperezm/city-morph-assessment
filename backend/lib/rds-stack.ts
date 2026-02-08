@@ -52,20 +52,25 @@ export class RdsStack extends cdk.Stack {
       deleteAutomatedBackups: true,
     });
 
-    const seedDbFn = new lambdaNodejs.NodejsFunction(this, "seedDbFunction", {
-      entry: "lambda/init-db/seed.ts",
-      handler: "seedDb",
-      runtime: lambda.Runtime.NODEJS_24_X,
-      vpc: this.vpc,
-      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
-      securityGroups: [this.lambdaSecurityGroup],
-      environment: {
-        DB_SECRET_ARN: this.dbInstance.secret?.secretArn ?? "",
-      },
-    });
+    if (!this.dbInstance.secret) {
+      throw new Error("RDS instance secret not available");
+    }
+
+    const seedDbFn: lambdaNodejs.NodejsFunction =
+      new lambdaNodejs.NodejsFunction(this, "seedDbFunction", {
+        entry: "lambda/init-db/seed.ts",
+        handler: "seedDb",
+        runtime: lambda.Runtime.NODEJS_24_X,
+        vpc: this.vpc,
+        vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        securityGroups: [this.lambdaSecurityGroup],
+        environment: {
+          DB_SECRET_ARN: this.dbInstance.secret.secretArn,
+        },
+      });
 
     this.dbInstance.connections.allowDefaultPortFrom(this.lambdaSecurityGroup);
-    this.dbInstance.secret?.grantRead(seedDbFn);
+    this.dbInstance.secret.grantRead(seedDbFn);
     seedDbFn.node.addDependency(this.dbInstance);
 
     new cdk.CfnOutput(this, "DbEndpoint", {
@@ -73,7 +78,7 @@ export class RdsStack extends cdk.Stack {
     });
 
     new cdk.CfnOutput(this, "DbSecretArn", {
-      value: this.dbInstance.secret?.secretArn ?? "no-secret",
+      value: this.dbInstance.secret.secretArn,
     });
   }
 }

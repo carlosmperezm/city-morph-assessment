@@ -5,7 +5,7 @@ import { ApiStack } from "../lib/api-stack";
 import { RdsStack } from "../lib/rds-stack";
 import { S3Stack } from "../lib/s3-stack";
 
-const app = new cdk.App();
+const app: cdk.App = new cdk.App();
 
 new CognitoStack(app, "CognitoStack", {
   env: {
@@ -13,19 +13,19 @@ new CognitoStack(app, "CognitoStack", {
     region: process.env.CDK_DEFAULT_REGION,
   },
 });
-const rdsStack = new RdsStack(app, "RdsStack", {
+const rdsStack: RdsStack = new RdsStack(app, "RdsStack", {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
   },
 });
-const s3Stack = new S3Stack(app, "S3Stack", {
+const s3Stack: S3Stack = new S3Stack(app, "S3Stack", {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
   },
 });
-const apiStack = new ApiStack(app, "ApiStack", {
+const apiStack: ApiStack = new ApiStack(app, "ApiStack", {
   rdsStack,
   s3Stack,
   env: {

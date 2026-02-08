@@ -1,5 +1,7 @@
 import { PostConfirmationTriggerEvent } from "aws-lambda";
 import { CognitoIdentityServiceProvider } from "aws-sdk";
+import type { Role } from "../shared/types";
+import { isValidRole } from "../shared/validators";
 
 const cognito = new CognitoIdentityServiceProvider();
 
@@ -7,10 +9,17 @@ export async function assignGroups(
   event: PostConfirmationTriggerEvent,
 ): Promise<PostConfirmationTriggerEvent> {
   const { userPoolId, userName, request } = event;
-  const userRole = request.userAttributes["custom:role"];
+  const roleAttribute: string | undefined =
+    request.userAttributes["custom:role"];
+
+  if (!isValidRole(roleAttribute)) {
+    throw new Error(`Invalid role: ${roleAttribute}`);
+  }
+
+  const userRole: Role = roleAttribute;
 
   try {
-    const groupName = userRole === "admin" ? "Admin" : "Standard";
+    const groupName: string = userRole === "admin" ? "Admin" : "Standard";
 
     await cognito
       .adminAddUserToGroup({

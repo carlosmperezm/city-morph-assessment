@@ -1,18 +1,38 @@
+import * as lambda from "aws-lambda";
 import {
   SecretsManagerClient,
   GetSecretValueCommand,
+  GetSecretValueCommandOutput,
 } from "@aws-sdk/client-secrets-manager";
 import { Pool } from "pg";
+import { isValidDbSecret } from "../shared/validators";
 
-export async function seedDb() {
-  const secretsClient = new SecretsManagerClient({ region: "us-west-1" });
+export async function seedDb(): Promise<lambda.APIGatewayProxyResult> {
+  const secretsClient: SecretsManagerClient = new SecretsManagerClient({
+    region: "us-west-1",
+  });
   try {
-    const secretArn = process.env.DB_SECRET_ARN!;
-    const response = await secretsClient.send(
+    const secretArn: string | undefined = process.env.DB_SECRET_ARN;
+
+    if (!secretArn) {
+      throw new Error("DB_SECRET_ARN environment variable is not set");
+    }
+
+    const response: GetSecretValueCommandOutput = await secretsClient.send(
       new GetSecretValueCommand({ SecretId: secretArn }),
     );
-    const secret = JSON.parse(response.SecretString!);
-    const pool = new Pool({
+
+    if (!response.SecretString) {
+      throw new Error("Secret not found");
+    }
+
+    const secret: unknown = JSON.parse(response.SecretString);
+
+    if (!isValidDbSecret(secret)) {
+      throw new Error("Invalid secret format");
+    }
+
+    const pool: Pool = new Pool({
       host: secret.host,
       port: secret.port,
       database: secret.dbname,
@@ -22,6 +42,7 @@ export async function seedDb() {
         rejectUnauthorized: false,
       },
     });
+
     await pool.query(`
       DROP TABLE IF EXISTS products;
       
@@ -49,11 +70,17 @@ export async function seedDb() {
     `);
 
     await pool.end();
-    return { statusCode: 200, body: "DB initialized" };
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ message: "DB initialized successfully" }),
+    };
   } catch (error) {
     return {
-      statusCode: 400,
-      body: `And error occurred: ${error instanceof Error ? error.message : error}`,
+      statusCode: 500,
+      body: JSON.stringify({
+        error: "Database initialization failed",
+        message: error instanceof Error ? error.message : String(error),
+      }),
     };
   }
 }

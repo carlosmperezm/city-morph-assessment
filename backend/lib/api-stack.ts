@@ -19,10 +19,12 @@ export class ApiStack extends cdk.Stack {
 
     const { rdsStack, s3Stack } = props;
 
-    const dashboardFn = new lambdaNodejs.NodejsFunction(
-      this,
-      "DashboardFunction",
-      {
+    if (!rdsStack.dbInstance.secret) {
+      throw new Error("RDS instance secret is not available");
+    }
+
+    const dashboardFn: lambdaNodejs.NodejsFunction =
+      new lambdaNodejs.NodejsFunction(this, "DashboardFunction", {
         entry: "lambda/dashboard/get-data.ts",
         handler: "getData",
         runtime: lambda.Runtime.NODEJS_24_X,
@@ -31,42 +33,47 @@ export class ApiStack extends cdk.Stack {
         securityGroups: [rdsStack.lambdaSecurityGroup],
         environment: {
           DB_ENDPOINT: rdsStack.dbInstance.dbInstanceEndpointAddress,
-          DB_SECRET_ARN: rdsStack.dbInstance.secret?.secretArn ?? "",
+          DB_SECRET_ARN: rdsStack.dbInstance.secret.secretArn,
           DB_NAME: "citymorph",
+        },
+      });
+    const imagesFn: lambdaNodejs.NodejsFunction =
+      new lambdaNodejs.NodejsFunction(this, "ImagesFunction", {
+        entry: "lambda/images/get-images.ts",
+        handler: "getImages",
+        runtime: lambda.Runtime.NODEJS_24_X,
+        environment: {
+          BUCKET_NAME: s3Stack.imageBucket.bucketName,
+        },
+      });
+
+    rdsStack.dbInstance.secret.grantRead(dashboardFn);
+    s3Stack.imageBucket.grantRead(imagesFn);
+
+    const api: apigateway.RestApi = new apigateway.RestApi(
+      this,
+      "CityMorphApi",
+      {
+        restApiName: "city-morph-api",
+        defaultCorsPreflightOptions: {
+          allowOrigins: allowedOrigins,
+          allowMethods: ["GET"],
+          allowHeaders: [
+            "Content-Type",
+            "Authorization",
+            "X-Amz-Date",
+            "X-Api-Key",
+            "X-Amz-Security-Token",
+          ],
+          allowCredentials: true,
         },
       },
     );
-    const imagesFn = new lambdaNodejs.NodejsFunction(this, "ImagesFunction", {
-      entry: "lambda/images/get-images.ts",
-      handler: "getImages",
-      runtime: lambda.Runtime.NODEJS_24_X,
-      environment: {
-        BUCKET_NAME: s3Stack.imageBucket.bucketName,
-      },
-    });
 
-    rdsStack.dbInstance.secret?.grantRead(dashboardFn);
-    s3Stack.imageBucket.grantRead(imagesFn);
-
-    const api = new apigateway.RestApi(this, "CityMorphApi", {
-      restApiName: "city-morph-api",
-      defaultCorsPreflightOptions: {
-        allowOrigins: allowedOrigins,
-        allowMethods: ["GET"],
-        allowHeaders: [
-          "Content-Type",
-          "Authorization",
-          "X-Amz-Date",
-          "X-Api-Key",
-          "X-Amz-Security-Token",
-        ],
-        allowCredentials: true,
-      },
-    });
-
-    const dashboard = api.root.addResource("data");
+    const dashboard: apigateway.Resource = api.root.addResource("data");
     dashboard.addMethod("GET", new apigateway.LambdaIntegration(dashboardFn));
-    const images = api.root.addResource("images");
+
+    const images: apigateway.Resource = api.root.addResource("images");
     images.addMethod("GET", new apigateway.LambdaIntegration(imagesFn));
 
     new cdk.CfnOutput(this, "ApiUrl", {

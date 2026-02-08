@@ -3,7 +3,6 @@ import { Construct } from "constructs";
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import * as lambdaNodejs from "aws-cdk-lib/aws-lambda-nodejs";
 import * as lambda from "aws-cdk-lib/aws-lambda";
-import * as aws_iam from "aws-cdk-lib/aws-iam";
 
 export class CognitoStack extends cdk.Stack {
   public readonly userPool: cognito.UserPool;
@@ -50,20 +49,20 @@ export class CognitoStack extends cdk.Stack {
       precedence: 1,
     });
 
-    const postConfirmationLambda = new lambdaNodejs.NodejsFunction(
-      this,
-      "PostConfirmationFunction",
-      {
+    const postConfirmationLambda: lambdaNodejs.NodejsFunction =
+      new lambdaNodejs.NodejsFunction(this, "PostConfirmationFunction", {
         entry: "lambda/auth/assign-groups.ts",
         handler: "assignGroups",
         runtime: lambda.Runtime.NODEJS_24_X,
-      },
-    );
+      });
+
     postConfirmationLambda.addToRolePolicy(
       new cdk.aws_iam.PolicyStatement({
         effect: cdk.aws_iam.Effect.ALLOW,
         actions: ["cognito-idp:AdminAddUserToGroup"],
-        resources: ["*"],
+        resources: [
+          `arn:aws:cognito-idp:${this.region}:${this.account}:userpool/*`,
+        ],
       }),
     );
 

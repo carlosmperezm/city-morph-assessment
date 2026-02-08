@@ -1,6 +1,7 @@
 import * as cdk from "aws-cdk-lib";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
+import { allowedOrigins } from "../lambda/shared/cors";
 
 export class S3Stack extends cdk.Stack {
   public readonly imageBucket: s3.Bucket;
@@ -16,8 +17,8 @@ export class S3Stack extends cdk.Stack {
       cors: [
         {
           allowedMethods: [s3.HttpMethods.GET],
-          allowedOrigins: ["*"],
-          allowedHeaders: ["*"],
+          allowedOrigins: allowedOrigins,
+          allowedHeaders: ["Authorization", "Content-Type"],
         },
       ],
     });
