@@ -7,8 +7,8 @@ import { FiArrowDownCircle, FiArrowUpCircle } from "react-icons/fi";
 
 export default function Navbar({ user, setUser }: NavbarProps): JSX.Element {
   const [extendNavbar, setExtendNavbar] = useState<boolean>(true);
-  const navigate: NavigateFunction = useNavigate();
 
+  const navigate: NavigateFunction = useNavigate();
   const isUserAdmin: boolean = user["custom:role"] === "admin";
   const dynamicClasses: string = `${styles.userDetails} ${extendNavbar ? `${styles.show}` : `${styles.noShow}`}`;
 

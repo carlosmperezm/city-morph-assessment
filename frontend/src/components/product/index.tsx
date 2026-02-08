@@ -7,7 +7,7 @@ export default function Product({
   signedUrl,
   user,
 }: ProductProps): JSX.Element {
-  const isUserAdmin = user["custom:role"] === "admin";
+  const isUserAdmin: boolean = user["custom:role"] === "admin";
 
   return (
     <div className={styles.product}>

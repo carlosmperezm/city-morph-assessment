@@ -4,6 +4,7 @@ import {
   signIn,
   confirmSignUp,
   fetchUserAttributes,
+  type UserAttributeKey,
 } from "aws-amplify/auth";
 import { Link, useNavigate, type NavigateFunction } from "react-router-dom";
 import type { Role, SignUpPageProps } from "../../types";
@@ -38,7 +39,7 @@ export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
       setShowConfirmation(true);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error signing up");
+      setError(String(err));
     } finally {
       setIsLoading(false);
     }
@@ -55,11 +56,12 @@ export default function SignUpPage({ setUser }: SignUpPageProps): JSX.Element {
         confirmationCode,
       });
       await signIn({ username: email, password });
-      const currentUser = await fetchUserAttributes();
+      const currentUser: Partial<Record<UserAttributeKey, string>> =
+        await fetchUserAttributes();
       setUser(currentUser);
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error confirming signup");
+      setError(String(err));
     } finally {
       setIsLoading(false);
     }

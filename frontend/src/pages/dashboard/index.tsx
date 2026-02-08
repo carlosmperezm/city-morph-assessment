@@ -26,16 +26,14 @@ export default function DashboardPage({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function fetchData() {
+  useEffect((): void => {
+    async function fetchData(): Promise<void> {
       try {
-        const dashboardData = await getDashboardData();
-        console.log(dashboardData);
+        const dashboardData: DashboardData = await getDashboardData();
         const imagesKeys: string[] = dashboardData.products.map(
           (product) => product.image_key,
         );
-        const imagesUrls = await getSignedImageUrls(imagesKeys);
-        console.log("images urls: ", imagesUrls);
+        const imagesUrls: SignedImage[] = await getSignedImageUrls(imagesKeys);
 
         setDashboardData(dashboardData);
         setProductImages(imagesUrls);
@@ -43,11 +41,7 @@ export default function DashboardPage({
       } catch (err) {
         console.log("Failed to load dashboard", err);
         setIsLoading(false);
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Failed to load dashboard. Please try again ",
-        );
+        setError(String(err));
       }
     }
     fetchData();

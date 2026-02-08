@@ -3,6 +3,7 @@ import {
   signIn,
   confirmSignUp,
   resendSignUpCode,
+  type UserAttributeKey,
 } from "aws-amplify/auth";
 import { type JSX, useState, type SubmitEvent } from "react";
 import { Link, type NavigateFunction, useNavigate } from "react-router-dom";
@@ -18,7 +19,9 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   const navigate: NavigateFunction = useNavigate();
-  const needsConfirmation = error.includes("User needs to be authenticated");
+  const needsConfirmation: boolean = error.includes(
+    "User needs to be authenticated",
+  );
 
   async function handleLogIn(
     event: SubmitEvent<HTMLFormElement>,
@@ -27,13 +30,12 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
     setIsLoading(true);
     try {
       await signIn({ username: email, password });
-      const currentUser = await fetchUserAttributes();
+      const currentUser: Partial<Record<UserAttributeKey, string>> =
+        await fetchUserAttributes();
       setUser(currentUser);
       await navigate("/dashboard");
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Error to log in. Try again",
-      );
+      setError(String(err));
     } finally {
       setIsLoading(false);
     }
@@ -49,11 +51,12 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
         confirmationCode,
       });
       await signIn({ username: email, password });
-      const currentUser = await fetchUserAttributes();
+      const currentUser: Partial<Record<UserAttributeKey, string>> =
+        await fetchUserAttributes();
       setUser(currentUser);
       navigate("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Error confirming signup");
+      setError(String(err));
     } finally {
       setIsLoading(false);
     }

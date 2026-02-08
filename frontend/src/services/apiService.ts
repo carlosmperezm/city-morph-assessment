@@ -6,7 +6,7 @@ const API_NAME: string = "cityMorphAPI";
 export async function getDashboardData(): Promise<DashboardData> {
   const path: string = "/data";
   const response = await get({ apiName: API_NAME, path }).response;
-  const data = (await response.body.json()) as unknown;
+  const data: unknown = (await response.body.json()) as unknown;
   return data as DashboardData;
 }
 
@@ -19,6 +19,6 @@ export async function getSignedImageUrls(
     path,
     options: { queryParams: { keys: keys.join(",") } },
   }).response;
-  const data = (await response.body.json()) as unknown;
+  const data: unknown = (await response.body.json()) as unknown;
   return data as SignedImage[];
 }
