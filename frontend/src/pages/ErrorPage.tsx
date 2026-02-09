@@ -1,9 +1,6 @@
 import type { JSX } from "react";
 import { Link, useRouteError } from "react-router-dom";
-
-function isError(error: unknown): error is Error {
-  return error instanceof Error;
-}
+import { isError } from "../types/typeGuards";
 
 export function ErrorPage(): JSX.Element {
   const routeError: unknown = useRouteError();
