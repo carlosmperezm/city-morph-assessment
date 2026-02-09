@@ -77,7 +77,7 @@ export async function getData(
         "Access-Control-Allow-Origin": corsOrigin,
       },
       body: JSON.stringify({
-        error: "Oops there's an error",
+        error: "Could not fetch the data from the database",
         message: error instanceof Error ? error.message : String(error),
       }),
     };
