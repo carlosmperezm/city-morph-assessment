@@ -12,6 +12,7 @@ import Navbar from "../../components/navbar";
 import styles from "./styles.module.css";
 import Product from "../../components/product";
 import { ThreeDot } from "react-loading-indicators";
+import { isError } from "../../types/typeGuards";
 
 export default function DashboardPage({
   user,
@@ -41,11 +42,11 @@ export default function DashboardPage({
       } catch (err) {
         console.log("Failed to load dashboard", err);
         setIsLoading(false);
-        setError(String(err));
+        setError(isError(err) ? err.message : String(err));
       }
     }
     fetchData();
-  }, [user]);
+  }, []);
 
   if (isLoading) {
     return <ThreeDot color="#3b82f6" size="medium" text="" textColor="" />;
