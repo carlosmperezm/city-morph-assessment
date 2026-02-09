@@ -1,0 +1,11 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.linksContainer {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}

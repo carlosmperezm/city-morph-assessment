@@ -4,7 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { fetchUserAttributes, type UserAttributeKey } from "aws-amplify/auth";
 import DashboardPage from "./pages/dashboard";
 import { LoginPage } from "./pages/login";
-import { RouteNotExistsPage } from "./pages/RouteNotExistsPage";
+import { RouteNotExistsPage } from "./pages/RouteNotExists";
 import { ErrorPage } from "./pages/ErrorPage";
 import SignUpPage from "./pages/sign-up";
 import { ThreeDot } from "react-loading-indicators";
@@ -58,6 +58,11 @@ function App() {
               errorElement={<ErrorPage />}
             />
             <Route
+              path="/dashboard"
+              element={<LoginPage setUser={setUser} />}
+              errorElement={<ErrorPage />}
+            />
+            <Route
               path="/login"
               element={<LoginPage setUser={setUser} />}
               errorElement={<ErrorPage />}
@@ -69,7 +74,7 @@ function App() {
             />
           </>
         )}
-        <Route path="*" element={<RouteNotExistsPage />} />
+        <Route path="*" element={<RouteNotExistsPage user={user} />} />
       </Routes>
     </BrowserRouter>
   );

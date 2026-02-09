@@ -51,3 +51,6 @@ export interface ProductProps {
   signedUrl: string;
   user: Partial<Record<UserAttributeKey, string>>;
 }
+export interface RouteNotExistsProps {
+  user: Partial<Record<UserAttributeKey, string>> | null;
+}
