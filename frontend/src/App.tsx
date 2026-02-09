@@ -21,7 +21,8 @@ function App() {
         const currentUser = await fetchUserAttributes();
         setUser(currentUser);
         setIsLoading(false);
-      } catch {
+      } catch (err) {
+        console.log(err);
         setIsLoading(false);
       }
     }
