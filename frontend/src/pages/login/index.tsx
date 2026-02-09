@@ -9,6 +9,7 @@ import { type JSX, useState, type SubmitEvent } from "react";
 import { Link, type NavigateFunction, useNavigate } from "react-router-dom";
 import type { LoginPageProps } from "../../types";
 import styles from "./styles.module.css";
+import { isError } from "../../types/typeGuards";
 
 export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -19,15 +20,13 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
 
   const navigate: NavigateFunction = useNavigate();
-  const needsConfirmation: boolean = error.includes(
-    "User needs to be authenticated",
-  );
 
   async function handleLogIn(
     event: SubmitEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
     setIsLoading(true);
+
     try {
       await signIn({ username: email, password });
       const currentUser: Partial<Record<UserAttributeKey, string>> =
@@ -35,7 +34,15 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
       setUser(currentUser);
       await navigate("/dashboard");
     } catch (err) {
-      setError(String(err));
+      const errorMessage = isError(err) ? err.message : String(err);
+
+      if (errorMessage.includes("User needs to be authenticated")) {
+        await resendSignUpCode({ username: email });
+        setError("Verification code resent!");
+        setShowConfirmation(true);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -45,6 +52,7 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
   ): Promise<void> {
     event.preventDefault();
     setIsLoading(true);
+
     try {
       await confirmSignUp({
         username: email,
@@ -56,15 +64,10 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
       setUser(currentUser);
       navigate("/");
     } catch (err) {
-      setError(String(err));
+      setError(isError(err) ? err.message : String(err));
     } finally {
       setIsLoading(false);
     }
-  }
-  if (needsConfirmation) {
-    resendSignUpCode({ username: email });
-    setError("Verification code resent!");
-    setShowConfirmation(true);
   }
 
   if (showConfirmation) {
@@ -97,7 +100,7 @@ export function LoginPage({ setUser }: LoginPageProps): JSX.Element {
 
   return (
     <div className={styles.container}>
-      {error && <p className={styles.error}>Error:{error}</p>}
+      {error && <p className={styles.error}>Error: {error}</p>}
       <form onSubmit={handleLogIn} className={styles.form}>
         <h1>Login</h1>
         <input
